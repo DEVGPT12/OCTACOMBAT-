@@ -130,8 +130,9 @@ export class FighterModel {
     this.spine.add(this.chest);
 
     // Chest mesh (torso)
-    const chestGeo = new THREE.BoxGeometry(0.52, 0.45, 0.32);
+    const chestGeo = new THREE.SphereGeometry(0.31, 20, 16);
     const chestMesh = new THREE.Mesh(chestGeo, suitMat);
+    chestMesh.scale.set(0.92, 0.88, 0.68);
     chestMesh.castShadow = true;
     this.chest.add(chestMesh);
 
@@ -160,11 +161,17 @@ export class FighterModel {
     }
 
     // Armor plate / Hoodie vest / Gi lapel
-    const chestPlateGeo = new THREE.BoxGeometry(0.48, 0.38, 0.08);
-    const chestPlateMesh = new THREE.Mesh(chestPlateGeo, armorMat);
-    chestPlateMesh.position.z = 0.15;
-    chestPlateMesh.castShadow = true;
-    this.chest.add(chestPlateMesh);
+    // Split chest armor leaves the sculpted torso visible instead of hiding it
+    // behind one flat rectangular plate.
+    const chestPlateGeo = new THREE.BoxGeometry(0.19, 0.16, 0.055);
+    for (const side of [-1, 1]) {
+      const chestPlateMesh = new THREE.Mesh(chestPlateGeo, armorMat);
+      chestPlateMesh.position.set(side * 0.14, 0.11, 0.19);
+      chestPlateMesh.rotation.z = side * -0.18;
+      chestPlateMesh.rotation.y = side * -0.12;
+      chestPlateMesh.castShadow = true;
+      this.chest.add(chestPlateMesh);
+    }
 
     // Glowing Octagon Chest Emblem
     const emblemGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.02, 8);
@@ -191,8 +198,8 @@ export class FighterModel {
     this.head.add(neckMesh);
 
     // Head base
-    const headGeo = new THREE.SphereGeometry(0.18, 12, 10);
-    headGeo.scale(1, 1.15, 1.05);
+    const headGeo = new THREE.SphereGeometry(0.18, 20, 16);
+    headGeo.scale(0.94, 1.17, 1.02);
     const headMesh = new THREE.Mesh(headGeo, skinMat);
     headMesh.position.y = 0.16;
     headMesh.castShadow = true;
@@ -213,6 +220,11 @@ export class FighterModel {
     }
     const mouthMat = new THREE.MeshStandardMaterial({ color: 0x3a1718, roughness: 0.9 });
     this.materials.push(mouthMat);
+    const jawGeo = new THREE.SphereGeometry(0.115, 14, 10);
+    const jaw = new THREE.Mesh(jawGeo, skinMat);
+    jaw.scale.set(0.82, 0.52, 0.78);
+    jaw.position.set(0, 0.075, 0.055);
+    this.head.add(jaw);
     const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.012, 0.018), mouthMat);
     mouth.position.set(0, 0.095, 0.17);
     this.head.add(mouth);
@@ -483,9 +495,16 @@ export class FighterModel {
     gloveMat: THREE.Material
   ): THREE.Group {
     // Shoulder pauldron
-    const pauldronGeo = new THREE.SphereGeometry(0.12, 8, 8);
+    const pauldronGeo = new THREE.SphereGeometry(0.145, 14, 10);
     const pauldron = new THREE.Mesh(pauldronGeo, armorMat);
+    pauldron.scale.set(1.1, 0.82, 1.05);
+    pauldron.position.y = 0.015;
+    pauldron.castShadow = true;
     parentShoulder.add(pauldron);
+    const pauldronRim = new THREE.Mesh(new THREE.TorusGeometry(0.115, 0.012, 6, 16), gloveMat);
+    pauldronRim.position.set(0, -0.015, 0.015);
+    pauldronRim.rotation.x = Math.PI / 2;
+    parentShoulder.add(pauldronRim);
 
     // Upper arm
     const upperArmGeo = new THREE.CapsuleGeometry(0.072, 0.22, 4, 8);
@@ -540,9 +559,10 @@ export class FighterModel {
     bootMat: THREE.Material
   ): THREE.Group {
     // Thigh
-    const thighGeo = new THREE.CylinderGeometry(0.1, 0.08, 0.45, 8);
+    const thighGeo = new THREE.CapsuleGeometry(0.105, 0.27, 5, 10);
     const thigh = new THREE.Mesh(thighGeo, suitMat);
     thigh.position.y = -0.22;
+    thigh.scale.set(1.05, 1.0, 0.92);
     thigh.castShadow = true;
     parentHip.add(thigh);
 
@@ -552,14 +572,14 @@ export class FighterModel {
     parentHip.add(kneeJoint);
 
     // Shin / Knee guard
-    const shinGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.44, 8);
+    const shinGeo = new THREE.CapsuleGeometry(0.075, 0.26, 5, 10);
     const shin = new THREE.Mesh(shinGeo, armorMat);
     shin.position.y = -0.22;
     shin.castShadow = true;
     kneeJoint.add(shin);
 
     // Combat Boot
-    const bootGeo = new THREE.BoxGeometry(0.13, 0.14, 0.26);
+    const bootGeo = new THREE.BoxGeometry(0.16, 0.15, 0.3);
     const boot = new THREE.Mesh(bootGeo, bootMat);
     boot.position.set(0, -0.45, 0.06);
     boot.castShadow = true;
@@ -607,7 +627,9 @@ export class FighterModel {
     }
 
     // Facing direction
-    this.group.rotation.y = facing === 1 ? Math.PI / 2 : -Math.PI / 2;
+    // Three-quarter fighting stance: face the opponent while keeping the face
+    // visible to the side-on camera, rather than showing only the profile/back.
+    this.group.rotation.y = facing === 1 ? 1.18 : -1.18;
 
     // Ethereal rings rotation for Spectre
     if (this.auraRing) {
