@@ -112,7 +112,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Light Punch (Top-right) */}
         <button
-          onClick={() => onAction('attack_light'); }}
+          onPointerDown={(e) => { e.preventDefault(); onAction('attack_light'); }}
           className="absolute touch-none top-6 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-neutral-600 hover:border-red-500 shadow-md flex flex-col items-center justify-center transition-all"
           title="Coup Rapide (J)"
         >
@@ -122,8 +122,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Heavy Punch (Mid-right) */}
         <button
-          onClick={() => onAction('attack_heavy'); }}
-          className="absolute top-20 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-red-500 hover:border-red-400 shadow-md flex flex-col items-center justify-center transition-all glow-red"
+          onPointerDown={(e) => { e.preventDefault(); onAction('attack_heavy'); }}
+          className="absolute touch-none top-20 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-red-500 hover:border-red-400 shadow-md flex flex-col items-center justify-center transition-all glow-red"
           title="Coup Puissant (K)"
         >
           <span className="font-arcade text-xl font-bold text-red-400">POING</span>
@@ -132,8 +132,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Kick (Bottom-center) */}
         <button
-          onClick={() => onAction('attack_kick'); }}
-          className="absolute touch-none bottom-0 right-16 w-13 h-13 md:w-15 md:h-15 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-blue-500 hover:border-blue-400 shadow-md flex flex-col items-center justify-center transition-all glow-blue"
+          onPointerDown={(e) => { e.preventDefault(); onAction('attack_kick'); }}
+          className="absolute touch-none bottom-0 right-16 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-blue-500 hover:border-blue-400 shadow-md flex flex-col items-center justify-center transition-all glow-blue"
           title="Coup de Pied (L)"
         >
           <span className="font-arcade text-lg font-bold text-blue-400">PIED</span>
@@ -141,8 +141,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Jump / Air Attack (Mid-left) */}
         <button
-          onClick={() => onAction('attack_air')}
-          className="absolute top-20 right-30 w-12 h-12 md:w-14 md:h-14 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-cyan-500 hover:border-cyan-400 shadow-md flex flex-col items-center justify-center transition-all"
+          onPointerDown={(e) => { e.preventDefault(); onAction('attack_air'); }}
+          className="absolute top-20 right-20 w-12 h-12 md:w-14 md:h-14 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-cyan-500 hover:border-cyan-400 shadow-md flex flex-col items-center justify-center transition-all"
           title="Saut / Aérien"
         >
           <ArrowUp className="w-5 h-5 text-cyan-400" />
