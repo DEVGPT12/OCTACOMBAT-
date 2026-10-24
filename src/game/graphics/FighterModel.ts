@@ -374,8 +374,7 @@ export class FighterModel {
         if (!this.group.parent && this.group.userData.disposed) return;
         const rig = gltf.scene;
         rig.name = 'OCTACOMBAT_IMPORTED_HUMANOID';
-        // The source Soldier.glb faces away from the arena camera; flip its local forward axis.
-        rig.rotation.y = Math.PI;
+        // Keep the source rig's forward axis aligned with the combat stance.
         rig.scale.setScalar(1.25);
         rig.position.set(0, 0, 0);
         rig.traverse((node) => {
@@ -405,6 +404,84 @@ export class FighterModel {
             });
           }
         });
+        // Original OCTACOMBAT ninja identity: fitted face mask, eye slit,
+        // layered chest armor, shoulder guards and forearm wraps attached to the real rig.
+        const armorMat = new THREE.MeshStandardMaterial({
+          color: this.isPlayer ? 0x171923 : 0x111a2c,
+          roughness: 0.34, metalness: 0.72,
+        });
+        const trimMat = new THREE.MeshStandardMaterial({
+          color: accent, roughness: 0.28, metalness: 0.55,
+          emissive: accent, emissiveIntensity: 0.22,
+        });
+        const clothMat = new THREE.MeshStandardMaterial({
+          color: this.isPlayer ? 0x70151d : 0x123c78,
+          roughness: 0.86, metalness: 0.04, side: THREE.DoubleSide,
+        });
+        this.materials.push(armorMat, trimMat, clothMat);
+        const findBone = (...names: string[]) => {
+          for (const name of names) {
+            const found = this.importedBones.get(name.toLowerCase());
+            if (found) return found;
+          }
+          return undefined;
+        };
+        const headBone = findBone('mixamorigHead', 'Head');
+        if (headBone) {
+          const hood = new THREE.Mesh(new THREE.SphereGeometry(0.125, 16, 12), armorMat);
+          hood.scale.set(1.05, 1.12, 1.0);
+          hood.position.set(0, 0.025, -0.012);
+          hood.castShadow = true;
+          headBone.add(hood);
+          const mask = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.075, 0.13), clothMat);
+          mask.position.set(0, -0.055, 0.065);
+          mask.castShadow = true;
+          headBone.add(mask);
+          const eyeSlit = new THREE.Mesh(new THREE.BoxGeometry(0.145, 0.018, 0.012), trimMat);
+          eyeSlit.position.set(0, -0.005, 0.111);
+          headBone.add(eyeSlit);
+          for (const side of [-1, 1]) {
+            const cheek = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.06, 0.06), armorMat);
+            cheek.position.set(side * 0.078, -0.045, 0.035);
+            cheek.rotation.z = side * -0.18;
+            headBone.add(cheek);
+          }
+        }
+        const spineBone = findBone('mixamorigSpine2', 'mixamorigSpine1', 'mixamorigSpine', 'Spine');
+        if (spineBone) {
+          const chestPlate = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.28, 0.09), armorMat);
+          chestPlate.position.set(0, 0.055, 0.075);
+          chestPlate.rotation.x = -0.08;
+          chestPlate.castShadow = true;
+          spineBone.add(chestPlate);
+          const chestStripe = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.025, 0.012), trimMat);
+          chestStripe.position.set(0, 0.07, 0.126);
+          spineBone.add(chestStripe);
+          const sash = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.07, 0.11), clothMat);
+          sash.position.set(0, -0.16, 0.025);
+          spineBone.add(sash);
+          const cape = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.55), clothMat);
+          cape.position.set(0, -0.22, -0.075);
+          cape.rotation.x = 0.12;
+          spineBone.add(cape);
+        }
+        for (const [boneNames, side] of [
+          [['mixamorigLeftArm', 'LeftArm'], -1],
+          [['mixamorigRightArm', 'RightArm'], 1],
+        ] as const) {
+          const armBone = findBone(...boneNames);
+          if (!armBone) continue;
+          const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.105, 12, 10), armorMat);
+          shoulder.scale.set(1.1, 0.72, 0.9);
+          shoulder.position.set(side * -0.025, 0.015, 0.005);
+          shoulder.castShadow = true;
+          armBone.add(shoulder);
+          const armTrim = new THREE.Mesh(new THREE.TorusGeometry(0.067, 0.012, 6, 12), trimMat);
+          armTrim.position.set(0, -0.17, 0.012);
+          armTrim.rotation.x = Math.PI / 2;
+          armBone.add(armTrim);
+        }
+
         this.importedRig = rig;
         this.group.add(rig);
         // Hide only the old procedural body; retain the ground shadow and VFX.
