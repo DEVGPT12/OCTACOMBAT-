@@ -645,7 +645,7 @@ export class FighterModel {
         this.leftHipJoint.rotation.set(-0.2, 0, 0);
         this.leftKnee.rotation.set(0.3, 0, 0);
 
-        this.rightHipJoint.rotation.set(1.4 * kickSwing, -0.3, kickSwing * 0.8);
+        this.rightHipJoint.rotation.set(-1.4 * kickSwing, -0.3, -kickSwing * 0.8);
         this.rightKnee.rotation.set(Math.max(0, (1 - kickSwing) * 1.2), 0, 0);
         break;
       }
@@ -653,7 +653,7 @@ export class FighterModel {
       case 'attack_air': {
         // Flying dive kick
         this.chest.rotation.x = 0.4;
-        this.rightHipJoint.rotation.set(1.6, 0, 0.2);
+        this.rightHipJoint.rotation.set(-1.6, 0, -0.2);
         this.rightKnee.rotation.set(0.1, 0, 0);
         this.leftHipJoint.rotation.set(-0.5, 0, -0.2);
         this.leftKnee.rotation.set(1.2, 0, 0);
