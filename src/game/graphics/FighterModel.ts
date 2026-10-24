@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FighterDefinition, ActionState } from '../../types/combat';
 
 /**
@@ -35,6 +36,13 @@ export class FighterModel {
   private baseColors: Map<THREE.MeshStandardMaterial, THREE.Color> = new Map();
   private isFlashing = false;
   private flashTimer = 0;
+  private importedRig: THREE.Group | null = null;
+  private importedMixer: THREE.AnimationMixer | null = null;
+  private importedClips: THREE.AnimationClip[] = [];
+  private importedActions = new Map<string, THREE.AnimationAction>();
+  private importedCurrentAction: string | null = null;
+  private importedBones = new Map<string, THREE.Bone>();
+  private importedSkinTone = new THREE.Color(0x8d5524);
 
   constructor(fighterDef: FighterDefinition, isPlayer: boolean) {
     this.fighterDef = fighterDef;
@@ -352,6 +360,125 @@ export class FighterModel {
       sole.position.set(side * 0.16, 0.08, 0.09);
       this.group.add(sole);
     }
+
+    // Load a real skinned humanoid rig with authored idle/walk animations.
+    // Keep the procedural fighter as a resilient fallback if the CDN is unavailable.
+    this.loadHumanoidRig(primaryCol, secondaryCol, accentCol, skinCol);
+  }
+
+  private loadHumanoidRig(primary: THREE.Color, secondary: THREE.Color, accent: THREE.Color, skin: THREE.Color) {
+    const loader = new GLTFLoader();
+    loader.load(
+      'https://threejs.org/examples/models/gltf/Soldier.glb',
+      (gltf) => {
+        if (!this.group.parent && this.group.userData.disposed) return;
+        const rig = gltf.scene;
+        rig.name = 'OCTACOMBAT_IMPORTED_HUMANOID';
+        rig.scale.setScalar(1.25);
+        rig.position.set(0, 0, 0);
+        rig.traverse((node) => {
+          if (node instanceof THREE.Bone) {
+            this.importedBones.set(node.name.toLowerCase(), node);
+          }
+          if (node instanceof THREE.Mesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+            const materials = Array.isArray(node.material) ? node.material : [node.material];
+            materials.forEach((material) => {
+              if (!(material instanceof THREE.MeshStandardMaterial)) return;
+              const name = material.name.toLowerCase();
+              if (name.includes('skin') || name.includes('face') || name.includes('body')) {
+                material.color.copy(skin);
+                material.roughness = 0.72;
+              } else {
+                // Character-specific palette instead of the demo soldier's default green.
+                material.color.lerp(this.isPlayer ? primary : secondary, 0.72);
+                material.metalness = Math.max(material.metalness, 0.18);
+                material.roughness = Math.min(material.roughness, 0.72);
+                if (name.includes('visor') || name.includes('glass')) {
+                  material.emissive.copy(accent);
+                  material.emissiveIntensity = 0.25;
+                }
+              }
+            });
+          }
+        });
+        this.importedRig = rig;
+        this.group.add(rig);
+        // Hide only the old procedural body; retain the ground shadow and VFX.
+        this.hips.visible = false;
+        this.importedMixer = new THREE.AnimationMixer(rig);
+        this.importedClips = gltf.animations;
+        for (const clip of gltf.animations) {
+          const key = clip.name.toLowerCase();
+          if (key.includes('idle')) this.importedActions.set('idle', this.importedMixer.clipAction(clip));
+          else if (key.includes('walk')) this.importedActions.set('walk', this.importedMixer.clipAction(clip));
+          else if (key.includes('run')) this.importedActions.set('run', this.importedMixer.clipAction(clip));
+        }
+        this.playImportedAnimation('idle');
+      },
+      undefined,
+      () => {
+        // Offline/CDN failure leaves the existing procedural fighter fully playable.
+      },
+    );
+  }
+
+  private playImportedAnimation(name: string) {
+    const next = this.importedActions.get(name) || this.importedActions.get('idle');
+    if (!next || this.importedCurrentAction === name) return;
+    next.reset().fadeIn(0.18).play();
+    if (this.importedCurrentAction) {
+      const previous = this.importedActions.get(this.importedCurrentAction);
+      if (previous) previous.fadeOut(0.15);
+    }
+    this.importedCurrentAction = name;
+  }
+
+  private poseImportedRig(action: ActionState, progress: number) {
+    const bone = (...names: string[]) => {
+      for (const name of names) {
+        const found = this.importedBones.get(name.toLowerCase());
+        if (found) return found;
+      }
+      return undefined;
+    };
+    const lArm = bone('mixamorigLeftArm', 'LeftArm');
+    const rArm = bone('mixamorigRightArm', 'RightArm');
+    const lFore = bone('mixamorigLeftForeArm', 'LeftForeArm');
+    const rFore = bone('mixamorigRightForeArm', 'RightForeArm');
+    const lUpLeg = bone('mixamorigLeftUpLeg', 'LeftUpLeg');
+    const rUpLeg = bone('mixamorigRightUpLeg', 'RightUpLeg');
+    const lLeg = bone('mixamorigLeftLeg', 'LeftLeg');
+    const rLeg = bone('mixamorigRightLeg', 'RightLeg');
+    const spine = bone('mixamorigSpine', 'Spine');
+    const head = bone('mixamorigHead', 'Head');
+    // Small authored pose offsets on top of the rig's idle/walk animation.
+    if (action === 'attack_light' || action === 'attack_heavy' || action === 'attack_special') {
+      const strike = Math.sin(progress * Math.PI);
+      if (rArm) { rArm.rotation.x -= strike * (action === 'attack_heavy' ? 1.7 : 1.25); rArm.rotation.z += strike * 0.15; }
+      if (rFore) rFore.rotation.x -= strike * 0.85;
+      if (spine) spine.rotation.y += strike * 0.28;
+    } else if (action === 'attack_kick' || action === 'attack_air') {
+      const kick = Math.sin(progress * Math.PI);
+      if (rUpLeg) rUpLeg.rotation.x -= kick * 1.25;
+      if (rLeg) rLeg.rotation.x += kick * 0.45;
+      if (spine) spine.rotation.x -= kick * 0.18;
+    } else if (action === 'block' || action === 'crouch') {
+      if (lArm) lArm.rotation.x -= 0.6;
+      if (rArm) rArm.rotation.x -= 0.6;
+      if (lFore) lFore.rotation.x -= 0.7;
+      if (rFore) rFore.rotation.x -= 0.7;
+      if (action === 'crouch') { if (lUpLeg) lUpLeg.rotation.x += 0.45; if (rUpLeg) rUpLeg.rotation.x += 0.45; }
+    } else if (action === 'hit_light' || action === 'hit_heavy') {
+      if (spine) spine.rotation.x += action === 'hit_heavy' ? -0.45 : -0.2;
+      if (head) head.rotation.x -= 0.2;
+    } else if (action === 'victory') {
+      if (rArm) rArm.rotation.z -= 2.4;
+      if (rFore) rFore.rotation.x -= 0.5;
+    } else if (action === 'defeat' || action === 'knockdown') {
+      if (spine) spine.rotation.x -= 0.8;
+    }
   }
 
   private buildCharacterHeadgear(primaryCol: THREE.Color, secondaryCol: THREE.Color, accentCol: THREE.Color) {
@@ -626,10 +753,19 @@ export class FighterModel {
       }
     }
 
-    // Facing direction
-    // Three-quarter fighting stance: face the opponent while keeping the face
-    // visible to the side-on camera, rather than showing only the profile/back.
+    // Facing direction: three-quarter view keeps the face visible to the arena camera.
     this.group.rotation.y = facing === 1 ? 1.18 : -1.18;
+
+    if (this.importedMixer && this.importedRig) {
+      const moving = action === 'walk_forward' || action === 'walk_backward';
+      const attacking = action.startsWith('attack_') || action === 'hit_light' || action === 'hit_heavy';
+      this.playImportedAnimation(moving ? 'walk' : 'idle');
+      this.importedMixer.update(delta);
+      const progress = Math.min(1, Math.max(0, timer / Math.max(0.01, duration)));
+      if (attacking || action === 'block' || action === 'crouch' || action === 'victory' || action === 'defeat' || action === 'knockdown') {
+        this.poseImportedRig(action, progress);
+      }
+    }
 
     // Ethereal rings rotation for Spectre
     if (this.auraRing) {
@@ -868,6 +1004,8 @@ export class FighterModel {
   }
 
   public dispose() {
+    this.group.userData.disposed = true;
+    this.importedMixer?.stopAllAction();
     this.materials.forEach(mat => mat.dispose());
     this.group.traverse(child => {
       if (child instanceof THREE.Mesh) {
