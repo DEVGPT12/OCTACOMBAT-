@@ -825,7 +825,11 @@ export class CombatEngine {
     const dist = Math.abs(this.p1.position.x - this.p2.position.x);
 
     // Target camera position
-    const targetZ = Math.max(5.8, Math.min(8.6, 5.0 + dist * 0.38));
+    // Keep the full bodies in frame in the intended horizontal duel view.
+    const landscape = this.canvasMount.clientWidth >= this.canvasMount.clientHeight;
+    const targetZ = landscape
+      ? Math.max(6.2, Math.min(8.8, 5.8 + dist * 0.3))
+      : Math.max(7.8, Math.min(10.2, 7.4 + dist * 0.3));
     const targetX = midX * 0.6;
     const targetY = 2.1 + Math.max(this.p1.position.y, this.p2.position.y) * 0.25;
 
