@@ -203,3 +203,13 @@ button:focus-visible {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Mobile fighting view: preserve the full landscape playfield and keep controls above browser safe areas. */
+.fight-landscape { width: 100%; height: 100%; }
+@media (orientation: landscape) and (max-height: 520px) {
+  .fight-landscape { height: 100dvh; }
+}
+@media (orientation: portrait) {
+  .landscape-gate { touch-action: manipulation; }
+}
