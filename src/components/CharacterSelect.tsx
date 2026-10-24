@@ -40,7 +40,7 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-neutral-950 text-white select-none">
+    <div className="relative w-full h-full min-h-0 flex flex-col justify-start overflow-x-hidden overflow-y-auto bg-neutral-950 text-white select-none">
       {/* Background ambient lighting */}
       <div 
         className="absolute inset-0 opacity-25 transition-colors duration-500 blur-3xl pointer-events-none"
@@ -51,7 +51,7 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
       <div className="absolute inset-0 bg-scanlines opacity-40 pointer-events-none" />
 
       {/* Top Header */}
-      <div className="relative z-10 w-full px-6 py-4 flex items-center justify-between border-b border-neutral-800/80 bg-neutral-950/80 backdrop-blur-xs">
+      <div className="relative z-10 w-full px-3 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800/80 bg-neutral-950/90 backdrop-blur-xs">
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
@@ -62,13 +62,13 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
           >
             <ArrowLeft className="w-4 h-4" /> RETOUR
           </button>
-          <h2 className="font-arcade text-3xl md:text-4xl font-bold tracking-wider italic text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-red-400">
+          <h2 className="font-arcade text-xl sm:text-3xl md:text-4xl font-bold tracking-wide sm:tracking-wider italic text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-red-400">
             CHOISIS TON COMBATTANT
           </h2>
         </div>
 
         {/* Player 1 / CPU Toggle tab */}
-        <div className="flex items-center gap-2 bg-neutral-900 p-1 rounded-md border border-neutral-800 text-xs font-tech">
+        <div className="flex flex-wrap items-center gap-1 bg-neutral-900 p-1 rounded-md border border-neutral-800 text-[10px] sm:text-xs font-tech max-w-full">
           <button
             onClick={() => setIsPickingP2(false)}
             className={`px-3 py-1.5 rounded transition-all font-bold ${
@@ -93,10 +93,10 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
       </div>
 
       {/* Main Body: Grid on Left, Fighter Preview on Right */}
-      <div className="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-hidden">
+      <div className="relative z-10 flex-none grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 p-3 sm:p-6 overflow-visible">
         {/* Left Column: 8 Fighters Grid */}
         <div className="lg:col-span-7 flex flex-col justify-center">
-          <div className="grid grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4">
             {fightersList.map((fighter) => {
               const isSelected = isPickingP2 ? selectedP2 === fighter.id : selectedP1 === fighter.id;
               const isP1 = selectedP1 === fighter.id;
@@ -124,13 +124,13 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
                   >
                     {/* Fighter Glow Emblem */}
                     <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center opacity-80 group-hover:scale-110 transition-transform"
+                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center opacity-90 group-hover:scale-110 transition-transform shadow-lg"
                       style={{
                         backgroundColor: `${fighter.primaryColor}25`,
                         border: `2px solid ${fighter.primaryColor}`,
                       }}
                     >
-                      <span className="font-arcade text-3xl font-bold" style={{ color: fighter.primaryColor }}>
+                      <span className="font-arcade text-2xl sm:text-3xl font-bold drop-shadow-lg" style={{ color: fighter.primaryColor }}>
                         {fighter.name[0]}
                       </span>
                     </div>
@@ -194,7 +194,7 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
         </div>
 
         {/* Right Column: Fighter Details & Live Stats */}
-        <div className="lg:col-span-5 flex flex-col justify-between p-5 rounded-lg bg-neutral-900/90 border border-neutral-800">
+        <div className="lg:col-span-5 flex flex-col justify-between p-3 sm:p-5 rounded-lg bg-neutral-900/90 border border-neutral-800 octa-panel">
           <div>
             {/* Fighter Titles */}
             <div className="flex items-center gap-2 mb-1">
