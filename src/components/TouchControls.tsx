@@ -36,8 +36,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
   return (
     <div
-      className="absolute inset-x-0 bottom-4 pointer-events-none flex justify-between items-end px-4 md:px-8 select-none z-30 transition-opacity"
-      style={{ opacity }}
+      className="absolute inset-x-0 bottom-4 pointer-events-none flex justify-between items-end px-3 md:px-8 select-none z-50 transition-opacity" style={{ opacity, touchAction: "none" }}
     >
       {/* Virtual D-Pad / Directional Joystick (Bottom-Left) */}
       <div className="relative pointer-events-auto w-36 h-36 md:w-44 md:h-44 rounded-full bg-black/60 border-2 border-neutral-700/80 backdrop-blur-xs flex items-center justify-center p-2 shadow-2xl">
@@ -51,7 +50,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
           onPointerDown={() => handleDirStart('up')}
           onPointerUp={handleDirEnd}
           onPointerLeave={handleDirEnd}
-          className={`absolute top-1 inset-x-1/3 h-10 flex items-center justify-center rounded-t-xl transition-all ${
+          className={`absolute touch-none top-1 inset-x-1/3 h-10 flex items-center justify-center rounded-t-xl transition-all ${
             activeDir === 'up' ? 'bg-red-600 text-white scale-110' : 'bg-neutral-800/60 text-neutral-300'
           }`}
           title="Sauter"
@@ -100,11 +99,11 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
       </div>
 
       {/* Combat Action Buttons Cluster (Bottom-Right matching screenshot layout) */}
-      <div className="relative pointer-events-auto w-48 h-48 md:w-56 md:h-56">
+      <div className="relative pointer-events-auto w-44 h-44 md:w-56 md:h-56">
         {/* Special Move (Super attack) - Center Top Accent */}
         <button
-          onClick={() => onAction('attack_special')}
-          className="absolute top-0 right-16 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-amber-600 to-red-600 active:scale-90 border-2 border-amber-300/80 shadow-lg shadow-amber-950 flex flex-col items-center justify-center transition-all glow-red"
+          onPointerDown={(e) => { e.preventDefault(); onAction('attack_special'); }}
+          className="absolute touch-none top-0 right-16 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-amber-600 to-red-600 active:scale-90 border-2 border-amber-300/80 shadow-lg shadow-amber-950 flex flex-col items-center justify-center transition-all glow-red"
           title="Attaque Spéciale (Super)"
         >
           <Flame className="w-6 h-6 text-white animate-pulse" />
@@ -113,8 +112,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Light Punch (Top-right) */}
         <button
-          onClick={() => onAction('attack_light')}
-          className="absolute top-6 right-0 w-13 h-13 md:w-15 md:h-15 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-neutral-600 hover:border-red-500 shadow-md flex flex-col items-center justify-center transition-all"
+          onClick={() => onAction('attack_light'); }}
+          className="absolute touch-none top-6 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-neutral-600 hover:border-red-500 shadow-md flex flex-col items-center justify-center transition-all"
           title="Coup Rapide (J)"
         >
           <Zap className="w-5 h-5 text-red-400" />
@@ -123,8 +122,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Heavy Punch (Mid-right) */}
         <button
-          onClick={() => onAction('attack_heavy')}
-          className="absolute top-22 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-red-500 hover:border-red-400 shadow-md flex flex-col items-center justify-center transition-all glow-red"
+          onClick={() => onAction('attack_heavy'); }}
+          className="absolute top-20 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-red-500 hover:border-red-400 shadow-md flex flex-col items-center justify-center transition-all glow-red"
           title="Coup Puissant (K)"
         >
           <span className="font-arcade text-xl font-bold text-red-400">POING</span>
@@ -133,8 +132,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Kick (Bottom-center) */}
         <button
-          onClick={() => onAction('attack_kick')}
-          className="absolute bottom-0 right-16 w-13 h-13 md:w-15 md:h-15 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-blue-500 hover:border-blue-400 shadow-md flex flex-col items-center justify-center transition-all glow-blue"
+          onClick={() => onAction('attack_kick'); }}
+          className="absolute touch-none bottom-0 right-16 w-13 h-13 md:w-15 md:h-15 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-blue-500 hover:border-blue-400 shadow-md flex flex-col items-center justify-center transition-all glow-blue"
           title="Coup de Pied (L)"
         >
           <span className="font-arcade text-lg font-bold text-blue-400">PIED</span>
