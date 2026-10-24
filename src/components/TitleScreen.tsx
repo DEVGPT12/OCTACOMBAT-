@@ -35,7 +35,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   }, [onPlay]);
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-neutral-950 text-white select-none">
+    <div className="relative w-full h-full min-h-0 flex flex-col justify-between overflow-x-hidden overflow-y-auto bg-neutral-950 text-white select-none">
       {/* Background Graphic from Reference Artwork */}
       <div className="absolute inset-0 z-0">
         <img
@@ -48,7 +48,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
       </div>
 
       {/* Top Bar / Brand Tag */}
-      <div className="relative z-10 w-full px-8 py-5 flex items-center justify-between">
+      <div className="relative z-10 w-full px-4 sm:px-8 py-3 sm:py-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 border-2 border-red-500 clip-octagon flex items-center justify-center bg-red-600/30">
             <span className="font-arcade text-xl font-bold text-red-400">8</span>
@@ -77,9 +77,9 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
       </div>
 
       {/* Center Hero Lockup (OCTACOMBAT with Octagon Emblem) */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 -mt-6">
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-3 py-5 sm:px-4 sm:-mt-6">
         {/* Glowing Red Octagon Frame */}
-        <div className="relative flex items-center justify-center mb-1">
+        <div className="title-hero-emblem relative flex items-center justify-center mb-1">
           <div className="w-28 h-28 md:w-36 md:h-36 border-4 border-red-500 clip-octagon flex items-center justify-center bg-black/40 backdrop-blur-xs glow-red">
             <div className="w-20 h-20 md:w-28 md:h-28 border-2 border-red-400/60 clip-octagon flex items-center justify-center">
               <span className="font-arcade text-5xl md:text-7xl font-bold text-red-500 tracking-wider">
@@ -90,14 +90,14 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
         </div>
 
         {/* Bespoke OCTACOMBAT Typography Title */}
-        <h1 className="font-arcade text-7xl md:text-9xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-white via-neutral-100 to-red-500 drop-shadow-[0_10px_25px_rgba(239,68,68,0.7)] text-stroke-sm">
+        <h1 className="font-arcade text-5xl sm:text-7xl md:text-9xl font-bold tracking-wide sm:tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-white via-neutral-100 to-red-500 drop-shadow-[0_10px_25px_rgba(239,68,68,0.7)] text-stroke-sm">
           OCTACOMBAT
         </h1>
 
         {/* Slogan */}
         <div className="flex items-center gap-3 mt-1">
           <div className="w-8 md:w-16 h-0.5 bg-gradient-to-r from-transparent to-red-500" />
-          <p className="font-tech text-base md:text-xl font-bold tracking-[0.35em] text-red-400 uppercase drop-shadow-md">
+          <p className="font-tech text-xs sm:text-base md:text-xl font-bold tracking-[0.12em] sm:tracking-[0.35em] text-red-400 uppercase drop-shadow-md">
             8 COMBATTANTS • 1 SEUL CHAMPION
           </p>
           <div className="w-8 md:w-16 h-0.5 bg-gradient-to-l from-transparent to-red-500" />
@@ -105,8 +105,8 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
       </div>
 
       {/* Main Arcade Menu Navigation */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-3 sm:px-6 pb-4 sm:pb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
           <button
             onClick={() => {
               soundEngine.playRoundAnnounce('select');
@@ -187,7 +187,7 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
         </div>
 
         {/* Arcade Instructions Footer Hint */}
-        <div className="flex items-center justify-center gap-3 py-2 px-4 bg-black/70 rounded-full border border-neutral-800 text-xs font-tech text-neutral-300">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 py-2 px-3 bg-black/70 rounded-xl border border-neutral-800 text-[10px] sm:text-xs font-tech text-neutral-300">
           <span className="text-red-400 font-bold">CONTRÔLES :</span>
           <span>A / D (Déplacer)</span>
           <span>•</span>
