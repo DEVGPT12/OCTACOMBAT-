@@ -135,6 +135,30 @@ export class FighterModel {
     chestMesh.castShadow = true;
     this.chest.add(chestMesh);
 
+    // More human, comic-book anatomy: rounded chest, abdomen and neck forms
+    // soften the old blocky silhouette while preserving the articulated rig.
+    const anatomyMat = new THREE.MeshStandardMaterial({
+      color: skinCol, roughness: 0.72, metalness: 0.02,
+    });
+    this.materials.push(anatomyMat);
+    const pecGeo = new THREE.SphereGeometry(0.19, 14, 10);
+    for (const side of [-1, 1]) {
+      const pec = new THREE.Mesh(pecGeo, anatomyMat);
+      pec.scale.set(1.08, 0.67, 0.58);
+      pec.position.set(side * 0.125, 0.09, 0.165);
+      pec.castShadow = true;
+      this.chest.add(pec);
+    }
+    const absGeo = new THREE.SphereGeometry(0.105, 12, 10);
+    for (let row = 0; row < 2; row++) {
+      for (const side of [-1, 1]) {
+        const ab = new THREE.Mesh(absGeo, anatomyMat);
+        ab.scale.set(0.72, 0.8, 0.48);
+        ab.position.set(side * 0.07, -0.12 - row * 0.115, 0.16);
+        this.chest.add(ab);
+      }
+    }
+
     // Armor plate / Hoodie vest / Gi lapel
     const chestPlateGeo = new THREE.BoxGeometry(0.48, 0.38, 0.08);
     const chestPlateMesh = new THREE.Mesh(chestPlateGeo, armorMat);
@@ -173,6 +197,25 @@ export class FighterModel {
     headMesh.position.y = 0.16;
     headMesh.castShadow = true;
     this.head.add(headMesh);
+
+    // Stylized human facial silhouette: nose bridge, ears and mouth line.
+    const noseGeo = new THREE.SphereGeometry(0.035, 8, 8);
+    const nose = new THREE.Mesh(noseGeo, skinMat);
+    nose.scale.set(0.72, 1.35, 1.0);
+    nose.position.set(0, 0.145, 0.177);
+    this.head.add(nose);
+    const earGeo = new THREE.SphereGeometry(0.045, 8, 8);
+    for (const side of [-1, 1]) {
+      const ear = new THREE.Mesh(earGeo, skinMat);
+      ear.scale.set(0.55, 1.0, 0.7);
+      ear.position.set(side * 0.174, 0.16, 0.005);
+      this.head.add(ear);
+    }
+    const mouthMat = new THREE.MeshStandardMaterial({ color: 0x3a1718, roughness: 0.9 });
+    this.materials.push(mouthMat);
+    const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.012, 0.018), mouthMat);
+    mouth.position.set(0, 0.095, 0.17);
+    this.head.add(mouth);
 
     // Facial features: readable eyes, brow ridge and jaw detail improve the
     // silhouette at the normal fight-camera distance.
@@ -401,7 +444,7 @@ export class FighterModel {
     parentShoulder.add(pauldron);
 
     // Upper arm
-    const upperArmGeo = new THREE.CylinderGeometry(0.075, 0.07, 0.32, 8);
+    const upperArmGeo = new THREE.CapsuleGeometry(0.072, 0.22, 4, 8);
     const upperArm = new THREE.Mesh(upperArmGeo, skinMat);
     upperArm.position.y = -0.16;
     upperArm.castShadow = true;
@@ -413,7 +456,7 @@ export class FighterModel {
     parentShoulder.add(elbowJoint);
 
     // Forearm / Gauntlet
-    const forearmGeo = new THREE.CylinderGeometry(0.07, 0.065, 0.3, 8);
+    const forearmGeo = new THREE.CapsuleGeometry(0.064, 0.19, 4, 8);
     const forearm = new THREE.Mesh(forearmGeo, armorMat);
     forearm.position.y = -0.15;
     forearm.castShadow = true;
