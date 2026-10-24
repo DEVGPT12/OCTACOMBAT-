@@ -408,8 +408,19 @@ export class CombatEngine {
     }
 
     // 2. Physics & State updates for both fighters
+    this.updateAIMovement(delta);
     this.updateFighterPhysics(this.p1, this.p1Def, delta);
     this.updateFighterPhysics(this.p2, this.p2Def, delta);
+
+    // Keep fighters from passing through one another or occupying the same space.
+    const minimumSeparation = 0.82;
+    const horizontalGap = this.p2.position.x - this.p1.position.x;
+    if (Math.abs(horizontalGap) < minimumSeparation) {
+      const direction = horizontalGap >= 0 ? 1 : -1;
+      const correction = (minimumSeparation - Math.abs(horizontalGap)) * 0.5;
+      this.p1.position.x -= direction * correction;
+      this.p2.position.x += direction * correction;
+    }
 
     // 3. Keep facing each other unless locked in forward attack
     if (!this.p1.action.startsWith('attack_')) {
@@ -493,6 +504,27 @@ export class CombatEngine {
     } else if (this.p1.isGrounded) {
       this.p1.action = 'idle';
       this.p1.isBlocking = false;
+    }
+  }
+
+  /** Move the CPU fighter every frame; AI decisions only choose its intent. */
+  private updateAIMovement(delta: number) {
+    const ai = this.p2;
+    if (ai.isHitStunned || ai.action.startsWith('attack_') ||
+        ai.action === 'knockdown' || ai.action === 'getup' ||
+        ai.action === 'victory' || ai.action === 'defeat') return;
+
+    const speed = 3.6 * (this.p2Def.stats.speed / 8);
+    if (ai.action === 'walk_forward') {
+      ai.position.x += ai.facing * speed * delta;
+      ai.isBlocking = false;
+    } else if (ai.action === 'walk_backward') {
+      ai.position.x -= ai.facing * speed * delta;
+      ai.isBlocking = true;
+    } else if (ai.action === 'block' || ai.action === 'crouch') {
+      ai.isBlocking = true;
+    } else if (ai.action === 'idle') {
+      ai.isBlocking = false;
     }
   }
 
