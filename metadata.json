@@ -1,0 +1,6 @@
+{
+  "name": "OCTACOMBAT - 8 Combattants. 1 Seul Champion.",
+  "description": "Jeu de combat 3D d'arcade professionnel inspiré des arts martiaux et du cyberpunk avec 8 combattants uniques, combos fluides, arènes immersives et IA avancée.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

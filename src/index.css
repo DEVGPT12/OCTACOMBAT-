@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+}
+
+.font-arcade {
+  font-family: 'Teko', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.font-tech {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* Custom combat gradients and scanline effect */
+.bg-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
+}
+
+.glow-red {
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.6), inset 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.6), inset 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.6), inset 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+.text-stroke-sm {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.8);
+}
+
+.text-stroke-md {
+  -webkit-text-stroke: 2px rgba(0, 0, 0, 0.9);
+}
+
+/* Octagon clip path */
+.clip-octagon {
+  clip-path: polygon(
+    29% 0%, 71% 0%, 
+    100% 29%, 100% 71%, 
+    71% 100%, 29% 100%, 
+    0% 71%, 0% 29%
+  );
+}
+
+.clip-octagon-border {
+  clip-path: polygon(
+    30% 0%, 70% 0%, 
+    100% 30%, 100% 70%, 
+    70% 100%, 30% 100%, 
+    0% 70%, 0% 30%
+  );
+}
+
+.clip-slanted {
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+}
+
+.clip-slanted-right {
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%);
+}
