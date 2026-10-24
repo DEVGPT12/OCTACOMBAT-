@@ -168,13 +168,13 @@ export const FightHUD: React.FC<FightHUDProps> = ({
       </div>
 
       {/* Dynamic Hit Combo Counter (Left side matching reference image) */}
-      <div className="w-full flex items-center justify-between">
+      <div className="absolute top-[22%] left-4 right-4 flex items-start justify-between gap-3 pointer-events-none">
         {p1.comboCount >= 2 && (
-          <div className="flex flex-col items-start bg-black/60 p-3 rounded-lg border-l-4 border-amber-500 animate-bounce">
-            <span className="font-arcade text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 drop-shadow-[0_4px_12px_rgba(245,158,11,0.8)] leading-none italic">
+          <div className="max-w-[42vw] flex flex-col items-start bg-black/70 p-2 md:p-3 rounded-lg border-l-4 border-amber-500">
+            <span className="font-arcade text-2xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-orange-500 drop-shadow-[0_4px_12px_rgba(245,158,11,0.8)] leading-none italic">
               {p1.comboCount} HITS
             </span>
-            <span className="font-arcade text-2xl md:text-3xl font-bold tracking-widest text-white italic drop-shadow-md">
+            <span className="font-arcade text-lg md:text-3xl font-bold tracking-widest text-white italic drop-shadow-md">
               COMBO !
             </span>
             <span className="font-tech text-xs font-bold text-neutral-300">
@@ -184,7 +184,7 @@ export const FightHUD: React.FC<FightHUDProps> = ({
         )}
 
         {p2.comboCount >= 2 && (
-          <div className="ml-auto flex flex-col items-end bg-black/60 p-3 rounded-lg border-r-4 border-cyan-500 animate-bounce">
+          <div className="ml-auto max-w-[42vw] flex flex-col items-end bg-black/70 p-2 md:p-3 rounded-lg border-r-4 border-cyan-500">
             <span className="font-arcade text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-cyan-300 via-blue-400 to-indigo-500 drop-shadow-[0_4px_12px_rgba(6,182,212,0.8)] leading-none italic">
               {p2.comboCount} HITS
             </span>
