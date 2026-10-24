@@ -79,11 +79,21 @@ export class CombatEngine {
     // 1. Scene & Camera
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(arenaDef.skyColor);
-    this.scene.fog = new THREE.Fog(arenaDef.fogColor, 12, 38);
+    this.scene.fog = new THREE.Fog(arenaDef.fogColor, 18, 55);
+    // Reliable fill lighting keeps the fighters readable on mobile screens,
+    // even when an arena uses very dark materials or fog.
+    this.scene.add(new THREE.HemisphereLight(0xdbeafe, 0x292033, 2.0));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.0);
+    keyLight.position.set(-4, 9, 7);
+    keyLight.castShadow = true;
+    this.scene.add(keyLight);
+    const rimLight = new THREE.DirectionalLight(0x60a5fa, 1.8);
+    rimLight.position.set(5, 5, -5);
+    this.scene.add(rimLight);
 
     const aspect = canvasMount.clientWidth / canvasMount.clientHeight;
     this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    this.camera.position.set(0, 2.2, 7.8);
+    this.camera.position.set(0, 2.0, 6.6);
 
     // 2. Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -783,7 +793,7 @@ export class CombatEngine {
     const dist = Math.abs(this.p1.position.x - this.p2.position.x);
 
     // Target camera position
-    const targetZ = Math.max(6.8, Math.min(9.8, 5.8 + dist * 0.45));
+    const targetZ = Math.max(5.8, Math.min(8.6, 5.0 + dist * 0.38));
     const targetX = midX * 0.6;
     const targetY = 2.1 + Math.max(this.p1.position.y, this.p2.position.y) * 0.25;
 
