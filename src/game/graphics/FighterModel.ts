@@ -611,7 +611,7 @@ export class FighterModel {
         // Fast direct jab: extension and quick snap-back
         const ext = Math.sin(progress * Math.PI);
         this.chest.rotation.y = ext * 0.35;
-        this.leftShoulder.rotation.set(1.5, 0, 0);
+        this.leftShoulder.rotation.set(-1.5, 0, 0);
         this.leftElbow.rotation.set(-0.2 - (1 - ext) * 1.3, 0, 0);
         this.rightShoulder.rotation.set(0.8, -0.3, -0.2);
         this.rightElbow.rotation.set(-1.6, 0, 0);
@@ -624,13 +624,13 @@ export class FighterModel {
         if (progress < 0.3) {
           // Windup pullback
           this.chest.rotation.y = -phase * 0.5;
-          this.rightShoulder.rotation.set(2.2 * phase, -0.4, -0.5);
+          this.rightShoulder.rotation.set(-2.2 * phase, -0.4, -0.5);
           this.rightElbow.rotation.set(-1.8, 0, 0);
         } else {
           // Explosive delivery
           const strike = Math.sin((1 - phase) * Math.PI * 0.5);
           this.chest.rotation.y = 0.5 * (1 - phase);
-          this.rightShoulder.rotation.set(1.4, 0.2, 0);
+          this.rightShoulder.rotation.set(-1.4, 0.2, 0);
           this.rightElbow.rotation.set(-0.15, 0, 0);
         }
         break;
@@ -671,15 +671,15 @@ export class FighterModel {
         if (p < 0.35) {
           // Gather power stance
           this.hips.position.y = 0.8;
-          this.leftShoulder.rotation.set(1.6, 0.8, 0.8);
-          this.rightShoulder.rotation.set(1.6, -0.8, -0.8);
+          this.leftShoulder.rotation.set(-1.6, 0.8, 0.8);
+          this.rightShoulder.rotation.set(-1.6, -0.8, -0.8);
           this.chest.rotation.x = -0.3;
         } else {
           // Double palm / energy surge blast!
           this.hips.position.y = 0.9;
-          this.leftShoulder.rotation.set(1.5, 0.15, 0);
+          this.leftShoulder.rotation.set(-1.5, 0.15, 0);
           this.leftElbow.rotation.set(-0.1, 0, 0);
-          this.rightShoulder.rotation.set(1.5, -0.15, 0);
+          this.rightShoulder.rotation.set(-1.5, -0.15, 0);
           this.rightElbow.rotation.set(-0.1, 0, 0);
           this.chest.rotation.x = 0.2;
         }
