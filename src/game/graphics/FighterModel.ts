@@ -174,6 +174,42 @@ export class FighterModel {
     headMesh.castShadow = true;
     this.head.add(headMesh);
 
+    // Facial features: readable eyes, brow ridge and jaw detail improve the
+    // silhouette at the normal fight-camera distance.
+    const faceDarkMat = new THREE.MeshStandardMaterial({
+      color: 0x171923, roughness: 0.45, metalness: 0.15,
+    });
+    const eyeMat = new THREE.MeshStandardMaterial({
+      color: accentCol, emissive: accentCol, emissiveIntensity: 0.65,
+      roughness: 0.25, metalness: 0.2,
+    });
+    const browGeo = new THREE.BoxGeometry(0.095, 0.025, 0.035);
+    const eyeGeo = new THREE.SphereGeometry(0.018, 8, 6);
+    for (const side of [-1, 1]) {
+      const brow = new THREE.Mesh(browGeo, faceDarkMat);
+      brow.position.set(side * 0.065, 0.205, 0.157);
+      brow.rotation.z = side * -0.12;
+      this.head.add(brow);
+      const eye = new THREE.Mesh(eyeGeo, eyeMat);
+      eye.position.set(side * 0.064, 0.17, 0.169);
+      this.head.add(eye);
+    }
+    this.materials.push(faceDarkMat, eyeMat);
+
+    // Layered collar and diagonal chest harness give each fighter a stronger,
+    // less toy-like combat silhouette while retaining their palette.
+    const collarGeo = new THREE.CylinderGeometry(0.13, 0.16, 0.11, 8);
+    const collar = new THREE.Mesh(collarGeo, armorMat);
+    collar.position.set(0, 0.28, 0);
+    this.chest.add(collar);
+
+    const strapGeo = new THREE.BoxGeometry(0.075, 0.42, 0.045);
+    const strap = new THREE.Mesh(strapGeo, accentMat);
+    strap.position.set(0.13, 0.015, 0.19);
+    strap.rotation.z = -0.35;
+    strap.rotation.y = -0.12;
+    this.chest.add(strap);
+
     // Distinct character accessories / hair
     this.buildCharacterHeadgear(primaryCol, secondaryCol, accentCol);
 
