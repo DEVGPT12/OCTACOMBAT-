@@ -24,7 +24,9 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 }) => {
   const [activeDir, setActiveDir] = useState<string | null>(null);
 
-  const handleDirStart = (dir: 'left' | 'right' | 'up' | 'down') => {
+  const handleDirStart = (dir: 'left' | 'right' | 'up' | 'down', e?: React.PointerEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    if (e && e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
     setActiveDir(dir);
     onMovement(dir);
   };
@@ -34,12 +36,18 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
     onMovement('none');
   };
 
+  const handleAttack = (action: string, e: React.PointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+    onAction(action);
+  };
+
   return (
     <div
       className="absolute inset-x-0 bottom-4 pointer-events-none flex justify-between items-end px-3 md:px-8 select-none z-50 transition-opacity" style={{ opacity, touchAction: "none" }}
     >
       {/* Virtual D-Pad / Directional Joystick (Bottom-Left) */}
-      <div className="relative pointer-events-auto w-36 h-36 md:w-44 md:h-44 rounded-full bg-black/60 border-2 border-neutral-700/80 backdrop-blur-xs flex items-center justify-center p-2 shadow-2xl">
+      <div className="relative pointer-events-auto touch-none w-36 h-36 md:w-44 md:h-44 rounded-full bg-black/60 border-2 border-neutral-700/80 backdrop-blur-xs flex items-center justify-center p-2 shadow-2xl">
         {/* Center circle */}
         <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-neutral-800/80 border border-neutral-600 flex items-center justify-center pointer-events-none">
           <CircleDot className="w-6 h-6 text-neutral-400" />
@@ -47,7 +55,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Up / Jump */}
         <button
-          onPointerDown={() => handleDirStart('up')}
+          onPointerDown={(e) => handleDirStart('up', e)}
           onPointerUp={handleDirEnd}
           onPointerLeave={handleDirEnd}
           className={`absolute touch-none top-1 inset-x-1/3 h-10 flex items-center justify-center rounded-t-xl transition-all ${
@@ -60,7 +68,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Down / Crouch & Block */}
         <button
-          onPointerDown={() => handleDirStart('down')}
+          onPointerDown={(e) => handleDirStart('down', e)}
           onPointerUp={handleDirEnd}
           onPointerLeave={handleDirEnd}
           className={`absolute bottom-1 inset-x-1/3 h-10 flex items-center justify-center rounded-b-xl transition-all ${
@@ -73,7 +81,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Left */}
         <button
-          onPointerDown={() => handleDirStart('left')}
+          onPointerDown={(e) => handleDirStart('left', e)}
           onPointerUp={handleDirEnd}
           onPointerLeave={handleDirEnd}
           className={`absolute left-1 inset-y-1/3 w-10 flex items-center justify-center rounded-l-xl transition-all ${
@@ -86,7 +94,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Right */}
         <button
-          onPointerDown={() => handleDirStart('right')}
+          onPointerDown={(e) => handleDirStart('right', e)}
           onPointerUp={handleDirEnd}
           onPointerLeave={handleDirEnd}
           className={`absolute right-1 inset-y-1/3 w-10 flex items-center justify-center rounded-r-xl transition-all ${
@@ -102,7 +110,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
       <div className="relative pointer-events-auto w-44 h-44 md:w-56 md:h-56">
         {/* Special Move (Super attack) - Center Top Accent */}
         <button
-          onPointerDown={(e) => { e.preventDefault(); onAction('attack_special'); }}
+          onPointerDown={(e) => handleAttack('attack_special', e)}
           className="absolute touch-none top-0 right-16 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-tr from-amber-600 to-red-600 active:scale-90 border-2 border-amber-300/80 shadow-lg shadow-amber-950 flex flex-col items-center justify-center transition-all glow-red"
           title="Attaque Spéciale (Super)"
         >
@@ -112,7 +120,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Light Punch (Top-right) */}
         <button
-          onPointerDown={(e) => { e.preventDefault(); onAction('attack_light'); }}
+          onPointerDown={(e) => handleAttack('attack_light', e)}
           className="absolute touch-none top-6 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-neutral-600 hover:border-red-500 shadow-md flex flex-col items-center justify-center transition-all"
           title="Coup Rapide (J)"
         >
@@ -122,7 +130,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Heavy Punch (Mid-right) */}
         <button
-          onPointerDown={(e) => { e.preventDefault(); onAction('attack_heavy'); }}
+          onPointerDown={(e) => handleAttack('attack_heavy', e)}
           className="absolute touch-none top-20 right-0 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-red-500 hover:border-red-400 shadow-md flex flex-col items-center justify-center transition-all glow-red"
           title="Coup Puissant (K)"
         >
@@ -132,7 +140,7 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Kick (Bottom-center) */}
         <button
-          onPointerDown={(e) => { e.preventDefault(); onAction('attack_kick'); }}
+          onPointerDown={(e) => handleAttack('attack_kick', e)}
           className="absolute touch-none bottom-0 right-16 w-14 h-14 md:w-16 md:h-16 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-blue-500 hover:border-blue-400 shadow-md flex flex-col items-center justify-center transition-all glow-blue"
           title="Coup de Pied (L)"
         >
@@ -141,8 +149,8 @@ export const TouchControls: React.FC<TouchControlsProps> = ({
 
         {/* Jump / Air Attack (Mid-left) */}
         <button
-          onPointerDown={(e) => { e.preventDefault(); onAction('attack_air'); }}
-          className="absolute top-20 right-20 w-12 h-12 md:w-14 md:h-14 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-cyan-500 hover:border-cyan-400 shadow-md flex flex-col items-center justify-center transition-all"
+          onPointerDown={(e) => handleAttack('attack_air', e)}
+          className="absolute touch-none top-20 right-20 w-12 h-12 md:w-14 md:h-14 rounded-full bg-neutral-900/90 active:scale-90 border-2 border-cyan-500 hover:border-cyan-400 shadow-md flex flex-col items-center justify-center transition-all"
           title="Saut / Aérien"
         >
           <ArrowUp className="w-5 h-5 text-cyan-400" />
