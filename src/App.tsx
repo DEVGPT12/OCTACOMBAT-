@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Smartphone, RotateCw, Maximize2 } from 'lucide-react';
 import { TitleScreen } from './components/TitleScreen';
 import { CharacterSelect } from './components/CharacterSelect';
 import { FightHUD } from './components/FightHUD';
@@ -55,8 +56,26 @@ export default function App() {
   const [matchTimer, setMatchTimer] = useState<number>(80);
   const [currentRound, setCurrentRound] = useState<number>(1);
 
+  const [isPortrait, setIsPortrait] = useState(typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false);
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
   const combatEngineRef = useRef<CombatEngine | null>(null);
+
+  useEffect(() => {
+    const updateOrientation = () => setIsPortrait(window.innerHeight > window.innerWidth);
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', updateOrientation);
+    return () => { window.removeEventListener('resize', updateOrientation); window.removeEventListener('orientationchange', updateOrientation); };
+  }, []);
+
+  const enterLandscape = async () => {
+    try {
+      const root = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> };
+      if (!document.fullscreenElement && root.requestFullscreen) await root.requestFullscreen();
+      const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
+      if (orientation.lock) await orientation.lock('landscape');
+    } catch { /* Some mobile browsers only allow orientation lock after manual rotation. */ }
+    setIsPortrait(window.innerHeight > window.innerWidth);
+  };
 
   // Initialize Audio Volumes
   useEffect(() => {
@@ -235,6 +254,18 @@ export default function App() {
         <div className="relative w-full h-full">
           {/* Isolated WebGL Mount for Three.js (No React state re-renders) */}
           <div ref={canvasMountRef} className="absolute inset-0 w-full h-full z-0" />
+
+          {isPortrait && (
+            <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#050711]/95 p-6 text-center text-white landscape-gate">
+              <div className="max-w-sm">
+                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-red-500/60 bg-red-950/40"><RotateCw className="h-12 w-12 text-red-400" /></div>
+                <p className="font-arcade text-4xl font-black tracking-wider">TOURNE TON TÉLÉPHONE</p>
+                <p className="mt-3 text-sm text-slate-300">OCTACOMBAT se joue en paysage pour afficher toute l’arène, les deux combattants et les commandes.</p>
+                <button onClick={enterLandscape} className="mt-6 inline-flex items-center gap-2 rounded-lg border border-red-400 bg-red-600 px-5 py-3 font-bold text-white"><Maximize2 className="h-5 w-5" /> PASSER EN PLEIN ÉCRAN</button>
+                <p className="mt-3 text-xs text-slate-500">Si l’écran ne tourne pas automatiquement, tourne le téléphone à l’horizontale.</p>
+              </div>
+            </div>
+          )}
 
           {/* Arcade Fighting HUD */}
           {p1State && p2State && (
