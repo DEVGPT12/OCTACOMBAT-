@@ -374,6 +374,8 @@ export class FighterModel {
         if (!this.group.parent && this.group.userData.disposed) return;
         const rig = gltf.scene;
         rig.name = 'OCTACOMBAT_IMPORTED_HUMANOID';
+        // The source Soldier.glb faces away from the arena camera; flip its local forward axis.
+        rig.rotation.y = Math.PI;
         rig.scale.setScalar(1.25);
         rig.position.set(0, 0, 0);
         rig.traverse((node) => {
@@ -758,13 +760,11 @@ export class FighterModel {
 
     if (this.importedMixer && this.importedRig) {
       const moving = action === 'walk_forward' || action === 'walk_backward';
-      const attacking = action.startsWith('attack_') || action === 'hit_light' || action === 'hit_heavy';
       this.playImportedAnimation(moving ? 'walk' : 'idle');
       this.importedMixer.update(delta);
-      const progress = Math.min(1, Math.max(0, timer / Math.max(0.01, duration)));
-      if (attacking || action === 'block' || action === 'crouch' || action === 'victory' || action === 'defeat' || action === 'knockdown') {
-        this.poseImportedRig(action, progress);
-      }
+      // Keep the imported animation rig stable. The old procedural pose offsets
+      // were accumulated every frame on top of the GLTF animation, twisting limbs
+      // and making fighters lean or collapse. The animation mixer owns the skeleton.
     }
 
     // Ethereal rings rotation for Spectre
