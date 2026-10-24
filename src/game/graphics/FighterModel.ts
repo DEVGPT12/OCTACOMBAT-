@@ -253,6 +253,38 @@ export class FighterModel {
     strap.rotation.y = -0.12;
     this.chest.add(strap);
 
+    // Graphic-novel costume layers: shoulder piping, waist sash and hanging gi panels.
+    const trimMat = new THREE.MeshStandardMaterial({
+      color: accentCol, roughness: 0.38, metalness: 0.35,
+      emissive: accentCol, emissiveIntensity: 0.12,
+    });
+    this.materials.push(trimMat);
+    for (const side of [-1, 1]) {
+      const shoulderTrim = new THREE.Mesh(
+        new THREE.TorusGeometry(0.105, 0.018, 6, 12, Math.PI),
+        trimMat,
+      );
+      shoulderTrim.rotation.z = side === -1 ? Math.PI : 0;
+      shoulderTrim.position.set(side * 0.35, 0.18, 0.005);
+      this.chest.add(shoulderTrim);
+    }
+    const sash = new THREE.Mesh(new THREE.BoxGeometry(0.49, 0.075, 0.36), accentMat);
+    sash.position.set(0, -0.02, 0.015);
+    this.hips.add(sash);
+    for (const side of [-1, 1]) {
+      const panel = new THREE.Mesh(
+        new THREE.BoxGeometry(0.17, 0.31, 0.055),
+        suitMat,
+      );
+      panel.position.set(side * 0.13, -0.22, 0.13);
+      panel.rotation.z = side * -0.08;
+      panel.castShadow = true;
+      this.hips.add(panel);
+      const piping = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.27, 0.012), trimMat);
+      piping.position.set(side * 0.13, -0.22, 0.161);
+      this.hips.add(piping);
+    }
+
     // Distinct character accessories / hair
     this.buildCharacterHeadgear(primaryCol, secondaryCol, accentCol);
 
@@ -296,6 +328,18 @@ export class FighterModel {
     this.specialAuraMesh = new THREE.Mesh(auraGeo, auraMat);
     this.specialAuraMesh.position.y = 1.0;
     this.group.add(this.specialAuraMesh);
+
+    // Distinctive high-contrast fighter silhouette and comic-book ink accents.
+    const outlineMat = new THREE.MeshBasicMaterial({
+      color: 0x090b16, transparent: true, opacity: 0.48,
+    });
+    this.materials.push(outlineMat);
+    const bootSoleGeo = new THREE.BoxGeometry(0.2, 0.045, 0.32);
+    for (const side of [-1, 1]) {
+      const sole = new THREE.Mesh(bootSoleGeo, outlineMat);
+      sole.position.set(side * 0.16, 0.08, 0.09);
+      this.group.add(sole);
+    }
   }
 
   private buildCharacterHeadgear(primaryCol: THREE.Color, secondaryCol: THREE.Color, accentCol: THREE.Color) {
@@ -471,6 +515,20 @@ export class FighterModel {
     const fist = new THREE.Mesh(fistGeo, gloveMat);
     fist.castShadow = true;
     fistJoint.add(fist);
+    const knuckle = new THREE.Mesh(
+      new THREE.SphereGeometry(0.064, 8, 6),
+      gloveMat,
+    );
+    knuckle.scale.set(1, 0.72, 0.82);
+    knuckle.position.set(0, -0.005, 0.052);
+    fistJoint.add(knuckle);
+    const wrap = new THREE.Mesh(
+      new THREE.TorusGeometry(0.068, 0.018, 5, 10),
+      armorMat,
+    );
+    wrap.rotation.x = Math.PI / 2;
+    wrap.position.y = -0.22;
+    elbowJoint.add(wrap);
 
     return elbowJoint;
   }
