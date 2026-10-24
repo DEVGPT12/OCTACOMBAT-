@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { FighterDefinition, ActionState } from '../../types/combat';
 
 /**
@@ -8,6 +10,19 @@ import { FighterDefinition, ActionState } from '../../types/combat';
  * and materials for authentic fighting animations.
  */
 export class FighterModel {
+  // Load the source rig once and clone its skinned skeleton for both fighters.
+  // Concurrent independent requests were leaving one fighter on the primitive fallback.
+  private static humanoidAssetPromise: Promise<GLTF> | null = null;
+
+  private static getHumanoidAsset(): Promise<GLTF> {
+    if (!FighterModel.humanoidAssetPromise) {
+      FighterModel.humanoidAssetPromise = new GLTFLoader().loadAsync(
+        'https://threejs.org/examples/models/gltf/Soldier.glb',
+      );
+    }
+    return FighterModel.humanoidAssetPromise;
+  }
+
   public group: THREE.Group;
   public fighterDef: FighterDefinition;
   public isPlayer: boolean;
@@ -367,12 +382,10 @@ export class FighterModel {
   }
 
   private loadHumanoidRig(primary: THREE.Color, secondary: THREE.Color, accent: THREE.Color, skin: THREE.Color) {
-    const loader = new GLTFLoader();
-    loader.load(
-      'https://threejs.org/examples/models/gltf/Soldier.glb',
-      (gltf) => {
-        if (!this.group.parent && this.group.userData.disposed) return;
-        const rig = gltf.scene;
+    FighterModel.getHumanoidAsset().then((gltf) => {
+        if (this.group.userData.disposed) return;
+        // SkeletonUtils is required: a normal Object3D clone shares skinned bones.
+        const rig = SkeletonUtils.clone(gltf.scene);
         rig.name = 'OCTACOMBAT_IMPORTED_HUMANOID';
         // Keep the source rig's forward axis aligned with the combat stance.
         rig.scale.setScalar(1.25);
@@ -495,12 +508,9 @@ export class FighterModel {
           else if (key.includes('run')) this.importedActions.set('run', this.importedMixer.clipAction(clip));
         }
         this.playImportedAnimation('idle');
-      },
-      undefined,
-      () => {
-        // Offline/CDN failure leaves the existing procedural fighter fully playable.
-      },
-    );
+      }).catch(() => {
+        // If the shared asset cannot load, both fighters consistently keep the procedural fallback.
+      });
   }
 
   private playImportedAnimation(name: string) {
