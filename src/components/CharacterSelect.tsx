@@ -122,18 +122,7 @@ export const CharacterSelect: React.FC<CharacterSelectProps> = ({
                       background: `linear-gradient(135deg, ${fighter.secondaryColor} 0%, #000 100%)`,
                     }}
                   >
-                    {/* Fighter Glow Emblem */}
-                    <div
-                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center opacity-90 group-hover:scale-110 transition-transform shadow-lg"
-                      style={{
-                        backgroundColor: `${fighter.primaryColor}25`,
-                        border: `2px solid ${fighter.primaryColor}`,
-                      }}
-                    >
-                      <span className="font-arcade text-2xl sm:text-3xl font-bold drop-shadow-lg" style={{ color: fighter.primaryColor }}>
-                        {fighter.name[0]}
-                      </span>
-                    </div>
+                    <FighterPortrait fighterId={fighter.id} color={fighter.primaryColor} accent={fighter.accentColor} />
 
                     {/* Selection Badges */}
                     {isP1 && (
@@ -311,3 +300,33 @@ const StatBar: React.FC<StatBarProps> = ({ label, value, color, icon }) => (
     </span>
   </div>
 );
+
+
+const FighterPortrait: React.FC<{ fighterId: FighterId; color: string; accent: string }> = ({ fighterId, color, accent }) => {
+  const isHooded = fighterId === 'spectre';
+  const isMasked = fighterId === 'kai';
+  const isLongHair = fighterId === 'luna' || fighterId === 'maya';
+  const isHeavy = fighterId === 'razor';
+  const isSpiky = fighterId === 'octav' || fighterId === 'volt';
+  return (
+    <div className="fighter-portrait relative h-full w-full overflow-hidden" style={{ background: `radial-gradient(ellipse at 50% 28%, ${color}70 0%, transparent 56%), linear-gradient(145deg, ${color}30, #03050a 76%)` }} aria-hidden="true">
+      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(0deg, rgba(0,0,0,.75), transparent 45%), repeating-linear-gradient(135deg, transparent 0 9px, rgba(255,255,255,.07) 10px 11px)' }} />
+      <div className="absolute bottom-[-10%] left-[16%] h-[59%] w-[68%] rounded-t-[45%] border border-white/10" style={{ background: `linear-gradient(115deg, ${color} 0%, #10131d 70%)`, boxShadow: `0 0 28px ${color}40` }} />
+      {isLongHair && <div className="absolute left-[24%] top-[13%] h-[53%] w-[53%] rounded-t-[45%] rounded-b-[20%]" style={{ background: `linear-gradient(90deg, ${color}, ${accent})` }} />}
+      {isHooded && <div className="absolute left-[15%] top-[5%] h-[64%] w-[70%] rounded-t-[50%] rounded-b-[20%] border-2 border-slate-700 bg-slate-950 shadow-[0_0_25px_rgba(6,182,212,.25)]" />}
+      <div className={`absolute left-[31%] top-[19%] h-[36%] w-[39%] overflow-hidden rounded-[44%_44%_38%_38%] border border-white/20 ${isHeavy ? 'scale-110' : ''}`} style={{ background: 'linear-gradient(135deg, #e8b99a, #a66b52 72%, #3b2927)' }}>
+        <div className={`absolute left-[-10%] top-[-18%] h-[43%] w-[120%] rounded-t-[60%] ${isSpiky ? 'rotate-[-7deg]' : ''}`} style={{ background: `linear-gradient(120deg, ${color}, ${accent})`, clipPath: isSpiky ? 'polygon(0 100%, 8% 20%, 22% 70%, 35% 0, 48% 66%, 65% 10%, 78% 70%, 100% 25%, 100% 100%)' : undefined }} />
+        <div className="absolute left-[13%] top-[49%] h-[5%] w-[22%] rounded-full bg-slate-950" />
+        <div className="absolute right-[13%] top-[49%] h-[5%] w-[22%] rounded-full bg-slate-950" />
+        <div className="absolute bottom-[15%] left-[39%] h-[3%] w-[22%] rounded-full bg-black/70" />
+        {isMasked && <div className="absolute bottom-[8%] left-[-4%] h-[31%] w-[108%] border-y-2 border-red-400/60 bg-neutral-950" />}
+        {isHooded && <div className="absolute inset-x-0 top-[45%] h-[15%] bg-slate-950"><span className="absolute left-[17%] top-[40%] h-1 w-2 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee]" /><span className="absolute right-[17%] top-[40%] h-1 w-2 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee]" /></div>}
+      </div>
+      {isHeavy && <div className="absolute left-[20%] top-[40%] h-[14%] w-[60%] rounded-t-full border-t-4 border-amber-200/50" />}
+      <div className="absolute bottom-[18%] left-[6%] h-[17%] w-[40%] rotate-[-25deg] rounded-full border border-white/10" style={{ background: color }} />
+      <div className="absolute bottom-[18%] right-[6%] h-[17%] w-[40%] rotate-[25deg] rounded-full border border-white/10" style={{ background: color }} />
+      <div className="absolute bottom-[19%] right-[8%] h-[12%] w-[24%] rotate-[20deg] rounded-md border border-white/20" style={{ background: accent, boxShadow: `0 0 12px ${accent}65` }} />
+      <div className="absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-t from-black/90 to-transparent" />
+    </div>
+  );
+};
