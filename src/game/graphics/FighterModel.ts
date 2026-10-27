@@ -497,7 +497,13 @@ export class FighterModel {
 
         this.importedRig = rig;
         this.group.add(rig);
-        // Hide only the old procedural body; retain the ground shadow and VFX.
+        // Hide every procedural placeholder part when the imported human rig is ready.
+        // Keep only shadow and combat VFX so limbs are not doubled by two models.
+        for (const child of [...this.group.children]) {
+          if (child !== this.shadowMesh && child !== this.specialAuraMesh && child !== this.auraRing && child !== rig) {
+            child.visible = false;
+          }
+        }
         this.hips.visible = false;
         this.importedMixer = new THREE.AnimationMixer(rig);
         this.importedClips = gltf.animations;
@@ -842,8 +848,8 @@ export class FighterModel {
       }
     }
 
-    // Facing direction: three-quarter view keeps the face visible to the arena camera.
-    this.group.rotation.y = facing === 1 ? 1.18 : -1.18;
+    // Correct the imported Soldier's forward axis so opponents face each other.
+    this.group.rotation.y = facing === 1 ? -1.18 : 1.18;
 
     if (this.importedMixer && this.importedRig) {
       const moving = action === 'walk_forward' || action === 'walk_backward';
