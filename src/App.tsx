@@ -57,6 +57,7 @@ export default function App() {
   const [currentRound, setCurrentRound] = useState<number>(1);
 
   const [isPortrait, setIsPortrait] = useState(typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false);
+  const [isTouchDevice] = useState(typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches);
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
   const combatEngineRef = useRef<CombatEngine | null>(null);
 
@@ -145,16 +146,19 @@ export default function App() {
 
   // Screen Actions
   const handleStartQuickFight = () => {
+    void enterLandscape();
     setGameMode('arcade');
     setCurrentScreen('select');
   };
 
   const handleStartStory = () => {
+    void enterLandscape();
     setGameMode('story');
     setCurrentScreen('story');
   };
 
   const handleStartTraining = () => {
+    void enterLandscape();
     setGameMode('training');
     setPlayerFighterId('octav');
     setCpuFighterId('zen');
@@ -163,6 +167,7 @@ export default function App() {
   };
 
   const handleConfirmSelect = (p1Id: FighterId, p2Id: FighterId, arenaId: ArenaId) => {
+    void enterLandscape();
     setPlayerFighterId(p1Id);
     setCpuFighterId(p2Id);
     setCurrentArenaId(arenaId);
@@ -170,6 +175,7 @@ export default function App() {
   };
 
   const handleStartStoryStage = (p1Id: FighterId, oppId: FighterId, arenaId: ArenaId) => {
+    void enterLandscape();
     setPlayerFighterId(p1Id);
     setCpuFighterId(oppId);
     setCurrentArenaId(arenaId);
@@ -201,7 +207,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-black font-sans">
+    <div className="relative w-screen h-[100dvh] min-h-0 overflow-hidden bg-black font-sans">
       {/* 1. TITLE SCREEN */}
       {currentScreen === 'title' && (
         <TitleScreen
@@ -255,17 +261,7 @@ export default function App() {
           {/* Isolated WebGL Mount for Three.js (No React state re-renders) */}
           <div ref={canvasMountRef} className="absolute inset-0 w-full h-full z-0" />
 
-          {isPortrait && (
-            <div className="absolute inset-0 z-[100] flex items-center justify-center bg-[#050711]/95 p-6 text-center text-white landscape-gate">
-              <div className="max-w-sm">
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-red-500/60 bg-red-950/40"><RotateCw className="h-12 w-12 text-red-400" /></div>
-                <p className="font-arcade text-4xl font-black tracking-wider">TOURNE TON TÉLÉPHONE</p>
-                <p className="mt-3 text-sm text-slate-300">OCTACOMBAT se joue en paysage pour afficher toute l’arène, les deux combattants et les commandes.</p>
-                <button onClick={enterLandscape} className="mt-6 inline-flex items-center gap-2 rounded-lg border border-red-400 bg-red-600 px-5 py-3 font-bold text-white"><Maximize2 className="h-5 w-5" /> PASSER EN PLEIN ÉCRAN</button>
-                <p className="mt-3 text-xs text-slate-500">Si l’écran ne tourne pas automatiquement, tourne le téléphone à l’horizontale.</p>
-              </div>
-            </div>
-          )}
+
 
           {/* Arcade Fighting HUD */}
           {p1State && p2State && (
@@ -350,6 +346,23 @@ export default function App() {
             }
           }}
         />
+      )}
+
+      {/* Global Android landscape gate: title, selection, menus and combat all use landscape. */}
+      {isTouchDevice && isPortrait && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#050711] p-6 text-center text-white landscape-gate">
+          <div className="max-w-sm">
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-red-500/60 bg-red-950/40">
+              <RotateCw className="h-12 w-12 text-red-400" />
+            </div>
+            <p className="font-arcade text-4xl font-black tracking-wider">MODE PAYSAGE</p>
+            <p className="mt-3 text-base text-slate-300">Tout OCTACOMBAT se joue à l’horizontale : menu, choix des combattants, arène et commandes.</p>
+            <button onClick={enterLandscape} className="mt-6 inline-flex items-center gap-2 rounded-lg border border-red-400 bg-red-600 px-5 py-3 font-bold text-white">
+              <Maximize2 className="h-5 w-5" /> ACTIVER LE PAYSAGE
+            </button>
+            <p className="mt-3 text-xs text-slate-500">Si Android refuse le changement automatique, tourne physiquement le téléphone à l’horizontale.</p>
+          </div>
+        </div>
       )}
     </div>
   );
