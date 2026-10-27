@@ -93,7 +93,7 @@ export class CombatEngine {
 
     const aspect = canvasMount.clientWidth / canvasMount.clientHeight;
     this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    this.camera.position.set(0, 2.0, 6.6);
+    this.camera.position.set(0, 2.7, 9.2);
 
     // 2. Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -845,7 +845,7 @@ export class CombatEngine {
       this.cameraShakeIntensity = Math.max(0, this.cameraShakeIntensity - delta * 1.8);
     }
 
-    this.camera.lookAt(midX * 0.8, 1.4, 0);
+    this.camera.lookAt(midX * 0.8, 1.05, 0);
   }
 
   public handleResize() {
