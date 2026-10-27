@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { SkeletonUtils } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { clone as cloneSkinnedScene } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { FighterDefinition, ActionState } from '../../types/combat';
 
 /**
@@ -385,7 +385,7 @@ export class FighterModel {
     FighterModel.getHumanoidAsset().then((gltf) => {
         if (this.group.userData.disposed) return;
         // SkeletonUtils is required: a normal Object3D clone shares skinned bones.
-        const rig = SkeletonUtils.clone(gltf.scene);
+        const rig = cloneSkinnedScene(gltf.scene);
         rig.name = 'OCTACOMBAT_IMPORTED_HUMANOID';
         // Keep the source rig's forward axis aligned with the combat stance.
         rig.scale.setScalar(1.25);
