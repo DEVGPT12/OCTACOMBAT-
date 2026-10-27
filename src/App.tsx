@@ -168,8 +168,12 @@ export default function App() {
 
   const handleConfirmSelect = (p1Id: FighterId, p2Id: FighterId, arenaId: ArenaId) => {
     void enterLandscape();
+    // A versus match must never launch with the same fighter on both sides.
+    const opponentId = p1Id === p2Id
+      ? (p1Id !== 'octav' ? 'octav' : 'zen')
+      : p2Id;
     setPlayerFighterId(p1Id);
-    setCpuFighterId(p2Id);
+    setCpuFighterId(opponentId);
     setCurrentArenaId(arenaId);
     setCurrentScreen('fight');
   };
