@@ -180,8 +180,11 @@ export default function App() {
 
   const handleStartStoryStage = (p1Id: FighterId, oppId: FighterId, arenaId: ArenaId) => {
     void enterLandscape();
+    const safeOpponentId = p1Id === oppId
+      ? (p1Id !== 'octav' ? 'octav' : 'zen')
+      : oppId;
     setPlayerFighterId(p1Id);
-    setCpuFighterId(oppId);
+    setCpuFighterId(safeOpponentId);
     setCurrentArenaId(arenaId);
     setCurrentScreen('fight');
   };
