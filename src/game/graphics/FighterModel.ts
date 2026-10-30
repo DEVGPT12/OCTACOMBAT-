@@ -848,8 +848,8 @@ export class FighterModel {
       }
     }
 
-    // Correct the imported Soldier's forward axis so opponents face each other.
-    this.group.rotation.y = facing === 1 ? 1.48 : -1.48;
+    // Face the opponents directly across the horizontal arena (quarter-turn, not three-quarter).
+    this.group.rotation.y = facing === 1 ? Math.PI / 2 : -Math.PI / 2;
 
     if (this.importedMixer && this.importedRig) {
       const moving = action === 'walk_forward' || action === 'walk_backward';
